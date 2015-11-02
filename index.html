@@ -9,10 +9,21 @@
 
 </head>
 
-<div  ng-controller="ApiCtrl">
- {{schema}}
+<!-- <div  ng-controller="ApiCtrl"> -->
+<form ng-controller="ApiCtrl" id="submit" ng-submit="submit()">
+
+   Get schema variables: <input ng-model="schema">
+   <input type="submit" id="submit" value="Fetch variables" />
+   <p></p>
+   <p></p>
+
+   <label for="vars">Select variables: </label>
+   <select id="multipleSelect" ng-options="option.id for option in data.vars" multiple>
+      <option value=""> Undefined </option></select><br>
+</form>
+
 <script src="bundle.js"></script>
-</div>
+<!-- </div>  -->
 
 </body>
 

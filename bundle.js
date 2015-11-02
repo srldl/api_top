@@ -7,8 +7,12 @@ var api_top = angular.module('api_top',[]);
 
 
 api_top.controller('ApiCtrl', function($scope) {
-      $scope.schema = "test";
-     console.log("test");
+    console.log("Running..");
+
+     $scope.submit = function() {
+       console.log($scope.schema);
+       $scope.vars = ["test vars", "test vars2"];
+    };
 });
 
 },{"angular":3}],2:[function(require,module,exports){
