@@ -1,0 +1,30 @@
+{
+  "name": "api_top",
+  "version": "0.0.1",
+  "description": "Small service on top of Npolar APIs",
+  "main": "index.js",
+  "scripts": {
+    "start": "http-server -a vimsa.npolar.no -p 8000 -c-1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/srldl/api_top.git"
+  },
+  "keywords": [
+    "api",
+    "browserify"
+  ],
+  "author": "srldl",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/srldl/api_top/issues"
+  },
+  "homepage": "https://github.com/srldl/api_top#readme",
+  "devDependencies": {
+    "browserify": "^11.0.1",
+    "http-server": "^0.8.0"
+  },
+  "dependencies": {
+    "angular": "^1.4.4"
+  }
+}
