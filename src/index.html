@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en" ng-app="api_top">
+<head>
+  <meta charset="utf-8">
+  <title>API test</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+   <link rel="stylesheet" href="css/app.css">
+
+<script src="bundle.js"></script>
+</head>
+
+
+
+<!-- <div  ng-controller="ApiCtrl"> -->
+<div ng-controller="ApiCtrl">
+<form id="submit" ng-submit="submit()">
+   Get schema variables: <input ng-model="schema">
+   <input type="submit" id="submit" value="Fetch variables" />
+   <p></p>
+   <p></p>
+</form>
+<form id="submit_vars" ng-submit="submit_vars()">
+   <label for="vars">Select variables: </label>
+   <select ng-model="vars" multiple>
+        <option ng-repeat="item in keys" value="{{item}}">{{item}}</option>
+      </select>
+        <input type="submit" id="submit_vars" value="Fetch parameters" />
+</form>
+</div>
+
+
+<!-- </div>  -->
+
+</body>
+
+</html>
