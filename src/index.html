@@ -22,15 +22,21 @@
 </form>
 <form id="submit_vars" ng-submit="submit_vars()">
    <label for="vars">Select variables: </label>
-   <select ng-model="vars" multiple>
-        <option ng-repeat="item in keys" value="{{item}}">{{item}}</option>
+   <select id="vars" ng-model="vars" multiple>
+        <option id="selected" ng-repeat="item in keys" value="{{item}}">{{item}}</option>
       </select>
         <input type="submit" id="submit_vars" value="Fetch parameters" />
+
+    <h2>Results {{vars}}</h2>
+    <div class="chart"></div>
 </form>
 </div>
 
 
+
+
 <!-- </div>  -->
+ <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
 
 </body>
 

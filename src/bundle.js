@@ -29721,43 +29721,111 @@ var api_top = angular.module('api_top',['ngResource']);
 
 
 api_top.service('SchemaDBSearch', require('./js/SchemaDBSearch'));
-api_top.service('VarDBSearch', require('./js/VarDBSearch'));
+api_top.service('Schema2DBSearch', require('./js/Schema2DBSearch'));
 
 
 
-api_top.controller('ApiCtrl', function($scope, SchemaDBSearch) {
-    console.log("Running..");
-    $scope.keys = [];
+api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema2DBSearch) {
+     $scope.keys = [];
 
      $scope.submit = function() {
      //  $scope.vars = [ {id: "var1", description: "vars1 brukes til", type: "number"},
      //  {id: "var2", description: "vars2 brukes til", type: "integer" }];
 
-       var link = $scope.schema;
+       var schema2 = $scope.schema;
 
-       var full = SchemaDBSearch.get({search:link}, function(){
-       	    console.log("search done");
-       	    console.log(full);
-       	    //Extract keys from schema
+       //Get schema from input
+       var full = SchemaDBSearch.get({schema2:schema2}, function(){
+
+       	    //Extract keys from schema, send to select
        	    $scope.keys = Object.keys(full.properties);
-       	    console.log($scope.keys);
        });
 
+
+       //Parameter chosen
        $scope.submit_vars = function(){
-          console.log("vars");
-          console.log($scope);
-          //$scope.vars;
 
-          //Fetch scope vars
-           var full = VarDBSearch.get({search:sok}, function(){
-           });
+          //Fetch scope vars -var 0 only
+          var vars2 = $scope.vars;
 
-       };
+
+          var vars_res = Schema2DBSearch.get({schema2:schema2, vars2:vars2}, function(){
+              var prop = vars2[0];
+              var data2 = [];
+
+              var res = vars_res.feed.entries;
+
+              for (var i=0; i<res.length; i++) {
+                  //Push the variable onto an array
+                  data2.push(res[i][prop]);
+              }
+
+              //Count values in array..accumulate values
+              var u = {}, a = [];
+              for(var i = 0, l = data2.length; i < l; ++i){
+                    if(u.hasOwnProperty(data2[i])) {
+                       u[data2[i]]++;
+                       continue;
+                    }
+                    a.push(data2[i]);
+                    u[data2[i]] = 1;
+              }
+
+              //Get values
+              var values = [];
+              for(var key in u) {
+                  values.push(u[key]);
+              }
+
+
+              console.log('u', u);
+              console.log('a', values);
+
+
+              //Find maximum value, get height of bar plot (scale)
+              var arrayMax = Function.prototype.apply.bind(Math.max, null);
+              var maximum = arrayMax(values);
+              var scale = 1000/maximum;
+
+              var data = a;
+              console.log(u[data[12]]);
+
+              //Reset DOM from div tag
+              var node = document.getElementById("chart");
+              console.log('node', node);
+              if (node > 0) {
+                  console.log("ever come here?");
+                  node.innerHTML = '';
+              }
+
+
+          //Create a bar plot
+          d3.select(".chart").selectAll("div").data(data).enter().append("div")
+              .style("width", function(d) { return (u[d]*scale) + "px"; })
+              .text(function(d) { return d; });
+
+          }); //vars_res
+
+       }; //submit_vars
 
     };
 });
 
-},{"./js/SchemaDBSearch":6,"./js/VarDBSearch":7,"angular":4,"angular-resource":2}],6:[function(require,module,exports){
+},{"./js/Schema2DBSearch":6,"./js/SchemaDBSearch":7,"angular":4,"angular-resource":2}],6:[function(require,module,exports){
+'use strict';
+//service
+
+// @ngInject
+
+var Schema2DBSearch = function($resource){
+	//return $resource( 'https://apptest.data.npolar.no/sighting/?:search&format=json&locales=utf-8' , { search:'@search'}, {
+	return $resource( 'http://apptest.data.npolar.no/:schema2/?q=&fields=:vars2&limit=5000', { schema2:'@schema2', vars2:'@vars2'}, {
+    query: {method: 'GET'}
+    });
+};
+
+module.exports = Schema2DBSearch;
+},{}],7:[function(require,module,exports){
 'use strict';
 //service
 
@@ -29765,24 +29833,10 @@ api_top.controller('ApiCtrl', function($scope, SchemaDBSearch) {
 
 var SchemaDBSearch = function($resource){
 	//return $resource( 'https://apptest.data.npolar.no/sighting/?:search&format=json&locales=utf-8' , { search:'@search'}, {
-	return $resource( 'https://raw.githubusercontent.com/npolar/api.npolar.no/master/schema/:search.json', { search:'@search'}, {
+	return $resource( 'https://raw.githubusercontent.com/npolar/api.npolar.no/master/schema/:schema2.json', { schema2:'@schema2'}, {
     query: {method: 'GET'}
     });
 };
 
 module.exports = SchemaDBSearch;
-},{}],7:[function(require,module,exports){
-'use strict';
-//service
-
-// @ngInject
-
-var VarDBSearch = function($resource){
-	//return $resource( 'https://apptest.data.npolar.no/sighting/?:search&format=json&locales=utf-8' , { search:'@search'}, {
-	return $resource( 'https://raw.githubusercontent.com/npolar/api.npolar.no/master/schema/:search.json', { search:'@search'}, {
-    query: {method: 'GET'}
-    });
-};
-
-module.exports = VarDBSearch;
 },{}]},{},[5]);
