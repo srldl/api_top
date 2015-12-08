@@ -29755,6 +29755,7 @@ api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema2DBSearch) 
 
               var res = vars_res.feed.entries;
 
+
               for (var i=0; i<res.length; i++) {
                   //Push the variable onto an array
                   data2.push(res[i][prop]);
@@ -29788,16 +29789,13 @@ api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema2DBSearch) 
               var scale = 1000/maximum;
 
               var data = a;
-              console.log(u[data[12]]);
 
-              //Reset DOM from div tag
+              //Reset DOM from div tag in case you want another variable
               var node = document.getElementById("chart");
               console.log('node', node);
-              if (node > 0) {
-                  console.log("ever come here?");
+              if (node && node.hasChildNodes() ) {
                   node.innerHTML = '';
               }
-
 
           //Create a bar plot
           d3.select(".chart").selectAll("div").data(data).enter().append("div")
