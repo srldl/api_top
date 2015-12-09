@@ -29726,30 +29726,38 @@ api_top.service('Schema2DBSearch', require('./js/Schema2DBSearch'));
 
 
 api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema2DBSearch) {
+     //Initialize parameter array
      $scope.keys = [];
+     //Initalize visualisation choice
+     $scope.keysV = ['bar plot', 'pie chart'];
 
+     //Get shema
      $scope.submit = function() {
-     //  $scope.vars = [ {id: "var1", description: "vars1 brukes til", type: "number"},
-     //  {id: "var2", description: "vars2 brukes til", type: "integer" }];
 
-       var schema2 = $scope.schema;
+       var schema2 = $scope.schema2;
+       console.log(schema2);
 
        //Get schema from input
        var full = SchemaDBSearch.get({schema2:schema2}, function(){
 
        	    //Extract keys from schema, send to select
        	    $scope.keys = Object.keys(full.properties);
+            $scope.keys_all = Object.keys(full);
+            console.log('keys', $scope.keys_all);
        });
+      };
 
 
-       //Parameter chosen
+       //Choose parameters and visualisation
        $scope.submit_vars = function(){
 
           //Fetch scope vars -var 0 only
           var vars2 = $scope.vars;
+          var varsV = $scope.varsV;
+          console.log($scope);
 
 
-          var vars_res = Schema2DBSearch.get({schema2:schema2, vars2:vars2}, function(){
+          var vars_res = Schema2DBSearch.get({schema2:$scope.schema2, vars2:vars2}, function(){
               var prop = vars2[0];
               var data2 = [];
 
@@ -29778,11 +29786,6 @@ api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema2DBSearch) 
                   values.push(u[key]);
               }
 
-
-              console.log('u', u);
-              console.log('a', values);
-
-
               //Find maximum value, get height of bar plot (scale)
               var arrayMax = Function.prototype.apply.bind(Math.max, null);
               var maximum = arrayMax(values);
@@ -29792,8 +29795,7 @@ api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema2DBSearch) 
 
               //Reset DOM from div tag in case you want another variable
               var node = document.getElementById("chart");
-              console.log('node', node);
-              if (node && node.hasChildNodes() ) {
+              if (node && node.hasChildNodes()) {
                   node.innerHTML = '';
               }
 
@@ -29806,7 +29808,7 @@ api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema2DBSearch) 
 
        }; //submit_vars
 
-    };
+   // };
 });
 
 },{"./js/Schema2DBSearch":6,"./js/SchemaDBSearch":7,"angular":4,"angular-resource":2}],6:[function(require,module,exports){
