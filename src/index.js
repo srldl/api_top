@@ -21,7 +21,6 @@ api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema2DBSearch) 
      $scope.submit = function() {
 
        var schema2 = $scope.schema2;
-       console.log(schema2);
 
        //Get schema from input
        var full = SchemaDBSearch.get({schema2:schema2}, function(){
@@ -85,14 +84,38 @@ api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema2DBSearch) 
                   node.innerHTML = '';
               }
 
-          //Create a bar plot
-          d3.select(".chart").selectAll("div").data(data).enter().append("div")
-              .style("width", function(d) { return (u[d]*scale) + "px"; })
+              console.log(data);
+
+             /* var p = d3.select("body").selectAll("p").data([4, 8, 15, 16, 23, 42]).text(function(d) { return d; });
+
+              p.enter().append("p").text(function(d) { return d; });
+
+              p.exit().remove("p"); */
+
+              var x = d3.scale.linear().domain([0, d3.max(data)]).range([0, 420]);
+
+              // create_bar_plot(data);
+              //Create a bar plot
+              d3.select(".chart").selectAll("div").data(data).enter().append("div")
+              .style("width", function(d) { return x(d)*scale + "px"; })
               .text(function(d) { return d; });
 
           }); //vars_res
 
+
+
+
+
        }; //submit_vars
+
+        //Choose parameters
+       function create_bar_plot(data) {
+          alert("hi");
+          console.log(data);
+
+          d3.select(".chart").select("div").style("background-color", "red");
+       };
+
 
    // };
 });
