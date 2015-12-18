@@ -29731,7 +29731,17 @@ api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema2DBSearch) 
      //Initalize visualisation choice
      $scope.keysV = ['bar plot', 'pie chart'];
 
-     //Get shema
+     //Get schemas via https://api.npolar.no/service/_ids.json
+ /*      var full2 = SchemaDBSearch.get({schema2:schema2}, function(){
+            //Extract keys from schema, send to select
+            $scope.keys = Object.keys(full.properties);
+            $scope.keys_all = Object.keys(full);
+            console.log('keys', $scope.keys_all);
+       });
+      }; */
+
+
+     //Get schema
      $scope.submit = function() {
 
        var schema2 = $scope.schema2;

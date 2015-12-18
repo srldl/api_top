@@ -15,7 +15,11 @@
 <div ng-controller="ApiCtrl">
 <form id="submit" ng-submit="submit()">
   <h1>API generated statistics</h1>
-   Select schema(s): <input ng-model="schema2">
+   Select schema(s):  <input ng-model="schema2">
+ <!-- <select id="schema2" ng-model="schema2" multiple>
+        <option id="selectedV" ng-repeat="itemV in keysV" value="{{itemV}}">{{itemV}}</option>
+   </select><br /><br /> -->
+
    <input type="submit" id="submit" value="Fetch schema(s)" />
    <br />
    <br />
