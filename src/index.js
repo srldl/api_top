@@ -84,9 +84,8 @@ api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema2DBSearch) 
                   node.innerHTML = '';
               }
 
-              console.log(data);
-              console.log($scope.varsV[0]);
 
+              //Choose type of visualisation
               switch($scope.varsV[0]) {
                 case "pie chart": {
                         create_pie_chart(data);
@@ -99,11 +98,6 @@ api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema2DBSearch) 
                       }
               }
 
-             //  create_bar_plot(data, "pepper", "salt");
-           /*   d3.select(".chart").selectAll("div").data(data).enter().append("div")
-              .style("width", function(d) { return x(d)*scale + "px"; })
-              .text(function(d) { return d; });  */
-
           }); //vars_res
 
 
@@ -114,12 +108,13 @@ api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema2DBSearch) 
 
 
         function create_pie_chart(data) {
-                      var width = 960,
+                var width = 960,
                 height = 500,
                 radius = Math.min(width, height) / 2;
 
             var color = d3.scale.ordinal()
-                .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+                .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00",
+                  "#96abc5", "#8589a6", "#756888", "#63486b", "#a75d56", "#d8743c", "#f58c00"]);
 
             var arc = d3.svg.arc()
                 .outerRadius(radius - 10)
