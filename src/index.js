@@ -84,17 +84,18 @@ api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema2DBSearch) 
                   node.innerHTML = '';
               }
 
+              console.log(data);
 
               //Choose type of visualisation
               switch($scope.varsV[0]) {
                 case "pie chart": {
-                        create_pie_chart(data);
+                        create_pie_chart(data, $scope.explanation);
                         break;
                } case "bar plot": {
-                        create_bar_plot(data, "pepper", "salt");
+                        create_bar_plot(data, $scope.name_y_axis, $scope.name_x_axis, $scope.explanation);
                         break;
                } default: {
-                        create_bar_plot(data, "pepper", "salt");
+                        create_bar_plot(data, $scope.name_y_axis, $scope.name_x_axis, $scope.explanation);
                       }
               }
 
@@ -107,7 +108,7 @@ api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema2DBSearch) 
        }; //submit_vars
 
 
-        function create_pie_chart(data) {
+        function create_pie_chart(data, explanation) {
                 var width = 960,
                 height = 500,
                 radius = Math.min(width, height) / 2;
@@ -160,7 +161,7 @@ api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema2DBSearch) 
         };
 
         //Create bar plot
-       function create_bar_plot(data, y_axis_text, x_axis_text) {
+       function create_bar_plot(data, y_axis_text, x_axis_text, explanation) {
 
              var margin = {top: 20, right: 20, bottom: 30, left: 40},
                   width = 960 - margin.left - margin.right,
