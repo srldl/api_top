@@ -29719,42 +29719,55 @@ require('angular-resource');
 
 var api_top = angular.module('api_top',['ngResource']);
 
-
+api_top.service('Schema1DBSearch', require('./js/Schema1DBSearch'));
 api_top.service('SchemaDBSearch', require('./js/SchemaDBSearch'));
 api_top.service('Schema2DBSearch', require('./js/Schema2DBSearch'));
 
 
 
-api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema2DBSearch) {
+api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema1DBSearch, Schema2DBSearch) {
      //Initialize parameter array
      $scope.keys = [];
      //Initalize visualisation choice
      $scope.keysV = ['bar plot', 'pie chart'];
 
      //Get schemas via https://api.npolar.no/service/_ids.json
- /*      var full2 = SchemaDBSearch.get({schema2:schema2}, function(){
+      var full2 = Schema1DBSearch.get({}, function(){
             //Extract keys from schema, send to select
-            $scope.keys = Object.keys(full.properties);
-            $scope.keys_all = Object.keys(full);
-            console.log('keys', $scope.keys_all);
+            console.log(full2.ids);
+            var arr = full2.ids;
+
+            //remove the -api suffix (apptest only)
+            $scope.keysS = arr.map(function(el) {
+                  return el.replace('-api','');
+            });
+
        });
-      }; */
 
 
      //Get schema
      $scope.submit = function() {
 
-       var schema2 = $scope.schema2;
+       var schema = $scope.schema2;
+       console.log(schema2);
+
+      //Fetch input variables one by one
+      schema.map( function(schema2) {
+        console.log(schema2);
 
        //Get schema from input
        var full = SchemaDBSearch.get({schema2:schema2}, function(){
 
        	    //Extract keys from schema, send to select
-       	    $scope.keys = Object.keys(full.properties);
+       	    var keys2 = Object.keys(full.properties);
+            $scope.keys = keys2.map(function(el) {
+                  return schema2 + ' - ' + el;
+            });
             $scope.keys_all = Object.keys(full);
             console.log('keys', $scope.keys_all);
        });
-      };
+      });
+    };
 
 
        //Choose parameters and visualisation
@@ -29958,7 +29971,22 @@ api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema2DBSearch) 
    // };
 });
 
-},{"./js/Schema2DBSearch":6,"./js/SchemaDBSearch":7,"angular":4,"angular-resource":2}],6:[function(require,module,exports){
+},{"./js/Schema1DBSearch":6,"./js/Schema2DBSearch":7,"./js/SchemaDBSearch":8,"angular":4,"angular-resource":2}],6:[function(require,module,exports){
+'use strict';
+//service
+
+// @ngInject
+
+var Schema1DBSearch = function($resource){
+	// Get either http://apptest.data.npolar.no/service/_ids.json
+     // or  http://api.npolar.no/service/?q=&format=json&fields=path
+	return $resource( ' http://api.npolar.no/service/_ids.json', {}, {
+    query: {method: 'GET'}
+    });
+};
+
+module.exports = Schema1DBSearch;
+},{}],7:[function(require,module,exports){
 'use strict';
 //service
 
@@ -29972,7 +30000,7 @@ var Schema2DBSearch = function($resource){
 };
 
 module.exports = Schema2DBSearch;
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 'use strict';
 //service
 

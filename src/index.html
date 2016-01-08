@@ -15,24 +15,24 @@
 <div ng-controller="ApiCtrl">
 <form id="submit" ng-submit="submit()">
   <h1>API generated statistics</h1>
-   Select schema(s):  <input ng-model="schema2">
- <!-- <select id="schema2" ng-model="schema2" multiple>
-        <option id="selectedV" ng-repeat="itemV in keysV" value="{{itemV}}">{{itemV}}</option>
-   </select><br /><br /> -->
+   Select schema(s): <!-- <input ng-model="schema2"> -->
+   <select id="schema2" ng-model="schema2" multiple>
+        <option id="selectedS" ng-repeat="itemS in keysS" value="{{itemS}}">{{itemS}}</option>
+   </select>
 
    <input type="submit" id="submit" value="Fetch schema(s)" />
    <br />
    <br />
 </form>
 <form id="submit_vars" ng-submit="submit_vars()">
-   <label for="varsV">Select visualisation: </label>
-   <select id="varsV" ng-model="varsV" multiple>
-        <option id="selectedV" ng-repeat="itemV in keysV" value="{{itemV}}">{{itemV}}</option>
-   </select><br /><br />
    <label for="vars">Select variables: </label>
    <select id="vars" ng-model="vars" multiple>
         <option id="selected" ng-repeat="item in keys" value="{{item}}">{{item}}</option>
       </select><br /><br />
+      <label for="varsV">Select visualisation: </label>
+   <select id="varsV" ng-model="varsV" multiple>
+        <option id="selectedV" ng-repeat="itemV in keysV" value="{{itemV}}">{{itemV}}</option>
+   </select><br /><br />
 
    <label for="name_x_axis">Name X axis: </label><input type="text" id="name_x_axis" value="X axis" ng-model="name_x_axis" /><br /><br />
    <label for="name_y_axis">Name Y axis: </label><input type="text" id="name_y_axis" value="Y axis"
