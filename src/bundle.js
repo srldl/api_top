@@ -29749,7 +29749,6 @@ api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema1DBSearch, 
      $scope.submit = function() {
 
        var schema = $scope.schema2;
-       console.log(schema2);
 
       //Fetch input variables one by one
       schema.map( function(schema2) {
@@ -29764,7 +29763,6 @@ api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema1DBSearch, 
                   return schema2 + ' - ' + el;
             });
             $scope.keys_all = Object.keys(full);
-            console.log('keys', $scope.keys_all);
        });
       });
     };
@@ -29774,22 +29772,25 @@ api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema1DBSearch, 
        $scope.submit_vars = function(){
 
           //Fetch scope vars -var 0 only
-          var vars2 = $scope.vars;
+          //Need to strip off database name first
+          //Vars2 is the variable
+          var vars2 = ($scope.vars[0]).split(" - ");
           var varsV = $scope.varsV;
-          console.log($scope);
 
 
-          var vars_res = Schema2DBSearch.get({schema2:$scope.schema2, vars2:vars2}, function(){
-              var prop = vars2[0];
+          var vars_res = Schema2DBSearch.get({schema2:$scope.schema2, vars2:vars2[1]}, function(){
+              var prop = vars2[1];
+              console.log(prop);
               var data2 = [];
 
               var res = vars_res.feed.entries;
 
-
+               //data2 holds the array with all values of the variable
               for (var i=0; i<res.length; i++) {
                   //Push the variable onto an array
                   data2.push(res[i][prop]);
               }
+
 
               //Count values in array..accumulate values
               var u = {}, a = [];
@@ -29813,7 +29814,8 @@ api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema1DBSearch, 
               var maximum = arrayMax(values);
               var scale = 1000/maximum;
 
-              var data = a;
+              //data now holds the number of (all) possible outcomes from data2
+              var outcomes = a;
 
               //Reset DOM from div tag in case you want another variable
               var node = document.getElementById("chart");
@@ -29821,18 +29823,39 @@ api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema1DBSearch, 
                   node.innerHTML = '';
               }
 
-              console.log(data);
+              console.log("utfallsrom");
+              console.log(outcomes);
+              console.log(values);
+
+              //Create a json doc from the variables, values are counts,
+              //outcomes are possible values
+              var jsonArr = [];
+
+              //If undefined is a value, it must be set as a string
+              var undef = outcomes.indexOf(undefined);
+              outcomes[undef] = 'undefined';
+
+              for (var i = 0; i < values.length; i++) {
+                   console.log(outcomes[i]);
+                   jsonArr.push({"outcome": outcomes[i], "count": values[i]});
+              };
+
+              console.log('jsonArr', jsonArr);
+              var jsonData = JSON.stringify(jsonArr);
+              console.log(jsonData);
+
 
               //Choose type of visualisation
               switch($scope.varsV[0]) {
                 case "pie chart": {
-                        create_pie_chart(data, $scope.explanation);
+                      //  create_pie_chart(outcomes, jsonData, $scope.explanation);
+                      create_pie_chart(outcomes, values, $scope.explanation);
                         break;
                } case "bar plot": {
-                        create_bar_plot(data, $scope.name_y_axis, $scope.name_x_axis, $scope.explanation);
+                        create_bar_plot(outcomes, jsonData, $scope.name_y_axis, $scope.name_x_axis, $scope.explanation);
                         break;
                } default: {
-                        create_bar_plot(data, $scope.name_y_axis, $scope.name_x_axis, $scope.explanation);
+                        create_bar_plot(outcomes, jsonData, $scope.name_y_axis, $scope.name_x_axis, $scope.explanation);
                       }
               }
 
@@ -29845,14 +29868,50 @@ api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema1DBSearch, 
        }; //submit_vars
 
 
-        function create_pie_chart(data, explanation) {
-                var width = 960,
+function create_pie_chart(data, values, explanation) {
+    console.log("pie chart");
+    console.log(values);
+
+
+    var chartdata = values;
+
+    //  the size of the overall svg element
+    var height = 200,
+        width = 720,
+
+//  the width of each bar and the offset between each bar
+    barWidth = 40,
+    barOffset = 20;
+
+
+d3.select('.chart').append('svg')
+  .attr('width', width)
+  .attr('height', height)
+  .style('background', '#dff0d8')
+  .selectAll('rect').data(chartdata)
+  .enter().append('rect')
+    .style({'fill': '#3c763d', 'stroke': '#d6e9c6', 'stroke-width': '5'})
+    .attr('width', barWidth)
+    .attr('height', function (data) {
+        return data;
+    })
+    .attr('x', function (data, i) {
+        return i * (barWidth + barOffset);
+    })
+    .attr('y', function (data) {
+        return height - data;
+    });
+
+
+        /*        var width = 960,
                 height = 500,
                 radius = Math.min(width, height) / 2;
 
+            //The number of colors to display with the pie chart
             var color = d3.scale.ordinal()
                 .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00",
                   "#96abc5", "#8589a6", "#756888", "#63486b", "#a75d56", "#d8743c", "#f58c00"]);
+
 
             var arc = d3.svg.arc()
                 .outerRadius(radius - 10)
@@ -29862,9 +29921,10 @@ api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema1DBSearch, 
                 .outerRadius(radius - 40)
                 .innerRadius(radius - 40);
 
+
             var pie = d3.layout.pie()
                 .sort(null)
-                .value(function(d) { return d.population; });
+                .value(function(d) { return d.count; });
 
             var svg = d3.select(".chart").append("svg")
                 .attr("width", width)
@@ -29872,7 +29932,8 @@ api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema1DBSearch, 
                 .append("g")
                 .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
-            d3.json("data.json", function(error, data) {
+
+            d3.json('data.json', function(error, data) {
               if (error) throw error;
 
               var g = svg.selectAll(".arc")
@@ -29882,23 +29943,23 @@ api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema1DBSearch, 
 
               g.append("path")
                   .attr("d", arc)
-                  .style("fill", function(d) { return color(d.data.age); });
+                  .style("fill", function(d) { return color(d.data.outcome); });
 
               g.append("text")
                   .attr("transform", function(d) { return "translate(" + labelArc.centroid(d) + ")"; })
                   .attr("dy", ".35em")
-                  .text(function(d) { return d.data.age; });
+                  .text(function(d) { return d.data.outcome; });
             });
 
             function type(d) {
-              d.population = +d.population;
+              d.count = +d.count;
               return d;
-            }
+            } */
 
         };
 
         //Create bar plot
-       function create_bar_plot(data, y_axis_text, x_axis_text, explanation) {
+       function create_bar_plot(data, jsonData, y_axis_text, x_axis_text, explanation) {
 
              var margin = {top: 20, right: 20, bottom: 30, left: 40},
                   width = 960 - margin.left - margin.right,
@@ -29926,13 +29987,13 @@ api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema1DBSearch, 
                   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 
-              d3.json('data.json', function(error, data) {
+              d3.json(jsonData, function(error, data) {
                 if (error) throw error;
               // svg.data(data2);
 
 
-                x.domain(data.map(function(d) { console.log(d); return d.age; }));
-                y.domain([0, d3.max(data, function(d) { return d.population; })]);
+                x.domain(data.map(function(d) { console.log(d); return d.outcome; }));
+                y.domain([0, d3.max(data, function(d) { return d.count; })]);
 
 
                 svg.append("g")
@@ -29954,14 +30015,14 @@ api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema1DBSearch, 
                     .data(data)
                   .enter().append("rect")
                     .attr("class", "bar")
-                    .attr("x", function(d) { return x(d.age); })
+                    .attr("x", function(d) { return x(d.outcome); })
                     .attr("width", x.rangeBand())
-                    .attr("y", function(d) { return y(d.population); })
-                    .attr("height", function(d) { return height - y(d.population); });
+                    .attr("y", function(d) { return y(d.count); })
+                    .attr("height", function(d) { return height - y(d.count); });
               });
 
               function type(d) {
-                d.population = +d.population;
+                d.count = +d.countr;
                 return d;
               }
 
@@ -29980,7 +30041,7 @@ api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema1DBSearch, 
 var Schema1DBSearch = function($resource){
 	// Get either http://apptest.data.npolar.no/service/_ids.json
      // or  http://api.npolar.no/service/?q=&format=json&fields=path
-	return $resource( ' http://api.npolar.no/service/_ids.json', {}, {
+	return $resource( 'http://api.npolar.no/service/_ids.json', {}, {
     query: {method: 'GET'}
     });
 };
@@ -29994,7 +30055,7 @@ module.exports = Schema1DBSearch;
 
 var Schema2DBSearch = function($resource){
 	//return $resource( 'https://apptest.data.npolar.no/sighting/?:search&format=json&locales=utf-8' , { search:'@search'}, {
-	return $resource( 'http://apptest.data.npolar.no/:schema2/?q=&fields=:vars2&limit=5000', { schema2:'@schema2', vars2:'@vars2'}, {
+	return $resource( 'https://apptest.data.npolar.no/:schema2/?q=&fields=:vars2&limit=5000', { schema2:'@schema2', vars2:'@vars2'}, {
     query: {method: 'GET'}
     });
 };
