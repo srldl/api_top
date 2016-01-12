@@ -29734,7 +29734,6 @@ api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema1DBSearch, 
      //Get schemas via https://api.npolar.no/service/_ids.json
       var full2 = Schema1DBSearch.get({}, function(){
             //Extract keys from schema, send to select
-            console.log(full2.ids);
             var arr = full2.ids;
 
             //remove the -api suffix (apptest only)
@@ -29752,7 +29751,6 @@ api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema1DBSearch, 
 
       //Fetch input variables one by one
       schema.map( function(schema2) {
-        console.log(schema2);
 
        //Get schema from input
        var full = SchemaDBSearch.get({schema2:schema2}, function(){
@@ -29780,7 +29778,6 @@ api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema1DBSearch, 
 
           var vars_res = Schema2DBSearch.get({schema2:$scope.schema2, vars2:vars2[1]}, function(){
               var prop = vars2[1];
-              console.log(prop);
               var data2 = [];
 
               var res = vars_res.feed.entries;
@@ -29829,21 +29826,16 @@ api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema1DBSearch, 
 
               //Create a json doc from the variables, values are counts,
               //outcomes are possible values
-              var jsonArr = [];
+             // var jsonArr = [];
 
               //If undefined is a value, it must be set as a string
               var undef = outcomes.indexOf(undefined);
               outcomes[undef] = 'undefined';
 
-              for (var i = 0; i < values.length; i++) {
+          /*    for (var i = 0; i < values.length; i++) {
                    console.log(outcomes[i]);
                    jsonArr.push({"outcome": outcomes[i], "count": values[i]});
-              };
-
-              console.log('jsonArr', jsonArr);
-              var jsonData = JSON.stringify(jsonArr);
-              console.log(jsonData);
-
+              }; */
 
               //Choose type of visualisation
               switch($scope.varsV[0]) {
@@ -29852,10 +29844,10 @@ api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema1DBSearch, 
                       create_pie_chart(outcomes, values, $scope.explanation);
                         break;
                } case "bar plot": {
-                        create_bar_plot(outcomes, jsonData, $scope.name_y_axis, $scope.name_x_axis, $scope.explanation);
+                        create_bar_plot(outcomes, values, $scope.name_y_axis, $scope.name_x_axis, $scope.explanation);
                         break;
                } default: {
-                        create_bar_plot(outcomes, jsonData, $scope.name_y_axis, $scope.name_x_axis, $scope.explanation);
+                        create_bar_plot(outcomes, values, $scope.name_y_axis, $scope.name_x_axis, $scope.explanation);
                       }
               }
 
@@ -29869,41 +29861,8 @@ api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema1DBSearch, 
 
 
 function create_pie_chart(data, values, explanation) {
-    console.log("pie chart");
-    console.log(values);
 
-
-    var chartdata = values;
-
-    //  the size of the overall svg element
-    var height = 200,
-        width = 720,
-
-//  the width of each bar and the offset between each bar
-    barWidth = 40,
-    barOffset = 20;
-
-
-d3.select('.chart').append('svg')
-  .attr('width', width)
-  .attr('height', height)
-  .style('background', '#dff0d8')
-  .selectAll('rect').data(chartdata)
-  .enter().append('rect')
-    .style({'fill': '#3c763d', 'stroke': '#d6e9c6', 'stroke-width': '5'})
-    .attr('width', barWidth)
-    .attr('height', function (data) {
-        return data;
-    })
-    .attr('x', function (data, i) {
-        return i * (barWidth + barOffset);
-    })
-    .attr('y', function (data) {
-        return height - data;
-    });
-
-
-        /*        var width = 960,
+                var width = 960,
                 height = 500,
                 radius = Math.min(width, height) / 2;
 
@@ -29954,12 +29913,12 @@ d3.select('.chart').append('svg')
             function type(d) {
               d.count = +d.count;
               return d;
-            } */
+            }
 
         };
 
         //Create bar plot
-       function create_bar_plot(data, jsonData, y_axis_text, x_axis_text, explanation) {
+       function create_bar_plot(data, values, y_axis_text, x_axis_text, explanation) {
 
              var margin = {top: 20, right: 20, bottom: 30, left: 40},
                   width = 960 - margin.left - margin.right,
@@ -29987,7 +29946,7 @@ d3.select('.chart').append('svg')
                   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 
-              d3.json(jsonData, function(error, data) {
+              d3.json('data.json', function(error, data) {
                 if (error) throw error;
               // svg.data(data2);
 
