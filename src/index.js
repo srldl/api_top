@@ -112,41 +112,45 @@ api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema1DBSearch, 
 
               //Create a json doc from the variables, values are counts,
               //outcomes are possible values
-             // var jsonArr = [];
+              var jsonData = [];
 
               //If undefined is a value, it must be set as a string
               var undef = outcomes.indexOf(undefined);
               outcomes[undef] = 'undefined';
 
-          /*    for (var i = 0; i < values.length; i++) {
-                   console.log(outcomes[i]);
-                   jsonArr.push({"outcome": outcomes[i], "count": values[i]});
-              }; */
+              for (var i = 0; i < values.length; i++) {
+                    var jsonObj = new Object();
+                   jsonObj.outcome =  outcomes[i];
+                   jsonObj.count = values[i];
+                   jsonData.push(jsonObj);
+              };
+
+              console.log("jsonObj and jsonData");
+              console.log(jsonData);
+              //Get json object
+              //var jsonData = JSON.stringify(jsonObj);
+
 
               //Choose type of visualisation
               switch($scope.varsV[0]) {
                 case "pie chart": {
                       //  create_pie_chart(outcomes, jsonData, $scope.explanation);
-                      create_pie_chart(outcomes, values, $scope.explanation);
+                      create_pie_chart(jsonData, $scope.explanation);
                         break;
                } case "bar plot": {
-                        create_bar_plot(outcomes, values, $scope.name_y_axis, $scope.name_x_axis, $scope.explanation);
+                        create_bar_plot(jsonData, $scope.name_y_axis, $scope.name_x_axis, $scope.explanation);
                         break;
                } default: {
-                        create_bar_plot(outcomes, values, $scope.name_y_axis, $scope.name_x_axis, $scope.explanation);
+                        create_bar_plot(jsonData, $scope.name_y_axis, $scope.name_x_axis, $scope.explanation);
                       }
               }
 
           }); //vars_res
 
-
-
-
-
        }; //submit_vars
 
 
-function create_pie_chart(data, values, explanation) {
+function create_pie_chart(jsonData, explanation) {
 
                 var width = 960,
                 height = 500,
@@ -177,12 +181,8 @@ function create_pie_chart(data, values, explanation) {
                 .append("g")
                 .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
-
-            d3.json('data.json', function(error, data) {
-              if (error) throw error;
-
               var g = svg.selectAll(".arc")
-                  .data(pie(data))
+                  .data(pie(jsonData))
                 .enter().append("g")
                   .attr("class", "arc");
 
@@ -194,7 +194,7 @@ function create_pie_chart(data, values, explanation) {
                   .attr("transform", function(d) { return "translate(" + labelArc.centroid(d) + ")"; })
                   .attr("dy", ".35em")
                   .text(function(d) { return d.data.outcome; });
-            });
+          //  });
 
             function type(d) {
               d.count = +d.count;
@@ -204,7 +204,9 @@ function create_pie_chart(data, values, explanation) {
         };
 
         //Create bar plot
-       function create_bar_plot(data, values, y_axis_text, x_axis_text, explanation) {
+       function create_bar_plot(jsonData, y_axis_text, x_axis_text, explanation) {
+
+             console.log('create_bar_plot');
 
              var margin = {top: 20, right: 20, bottom: 30, left: 40},
                   width = 960 - margin.left - margin.right,
@@ -232,14 +234,11 @@ function create_pie_chart(data, values, explanation) {
                   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 
-              d3.json('data.json', function(error, data) {
-                if (error) throw error;
-              // svg.data(data2);
+                console.log("domains:");
+                console.log(jsonData);
 
-
-                x.domain(data.map(function(d) { console.log(d); return d.outcome; }));
-                y.domain([0, d3.max(data, function(d) { return d.count; })]);
-
+                x.domain(jsonData.map(function(d) { console.log(d.outcome); return d.outcome; }));
+                y.domain([0, d3.max(jsonData, function(d) { console.log(d.count); return d.count; })]);
 
                 svg.append("g")
                     .attr("class", "x axis")
@@ -257,14 +256,14 @@ function create_pie_chart(data, values, explanation) {
                     .text(y_axis_text);
 
                 svg.selectAll(".bar")
-                    .data(data)
+                    .data(jsonData)
                   .enter().append("rect")
                     .attr("class", "bar")
                     .attr("x", function(d) { return x(d.outcome); })
                     .attr("width", x.rangeBand())
                     .attr("y", function(d) { return y(d.count); })
                     .attr("height", function(d) { return height - y(d.count); });
-              });
+
 
               function type(d) {
                 d.count = +d.countr;
