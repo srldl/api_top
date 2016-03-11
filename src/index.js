@@ -5,48 +5,51 @@ require('angular-resource');
 
 var api_top = angular.module('api_top',['ngResource']);
 
-api_top.service('Schema1DBSearch', require('./js/Schema1DBSearch'));
-api_top.service('SchemaDBSearch', require('./js/SchemaDBSearch'));
-api_top.service('Schema2DBSearch', require('./js/Schema2DBSearch'));
+
+api_top.factory('SchemaDBSearch', require('./js/SchemaDBSearch'));
 
 
-
-api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema1DBSearch, Schema2DBSearch) {
+api_top.controller('ApiCtrl', function($scope, SchemaDBSearch) {
      //Initialize parameter array
      $scope.keys = [];
      //Initalize visualisation choice
      $scope.keysV = ['bar plot', 'pie chart'];
 
-     //Get schemas via https://api.npolar.no/service/_ids.json
-      var full2 = Schema1DBSearch.get({}, function(){
-            //Extract keys from schema, send to select
-            var arr = full2.ids;
+     var link = 'https://apptest.data.npolar.no:3000/service/_ids.json';
+     SchemaDBSearch.getValues(link).then(
+       function(results) {
+        // on success
 
-            //remove the -api suffix (apptest only)
-            $scope.keysS = arr.map(function(el) {
+        console.log(results.data.ids);
+         $scope.keysS = (results.data.ids).map(function(el) {
                   return el.replace('-api','');
             });
+    });
 
-       });
 
 
      //Get schema
-     $scope.submit = function() {
+    $scope.submit = function() {
 
        var schema = $scope.schema2;
 
-      //Fetch input variables one by one
-      schema.map( function(schema2) {
+       //Fetch input variables one by one
+       schema.map( function(schema2) {
 
        //Get schema from input
-       var full = SchemaDBSearch.get({schema2:schema2}, function(){
+       var link = 'https://apptest.data.npolar.no:3000/schema/' + schema2 + '.json';
 
-       	    //Extract keys from schema, send to select
-       	    var keys2 = Object.keys(full.properties);
-            $scope.keys = keys2.map(function(el) {
+       SchemaDBSearch.getValues(link).then( function(results) {
+         //on success
+
+         console.log(results);
+         var keys2 = Object.keys(results.data.properties);
+
+         console.log(keys2);
+         $scope.keys = (keys2).map(function(el) {
                   return schema2 + ' - ' + el;
-            });
-            $scope.keys_all = Object.keys(full);
+         });
+
        });
       });
     };
@@ -61,12 +64,14 @@ api_top.controller('ApiCtrl', function($scope, SchemaDBSearch, Schema1DBSearch, 
           var vars2 = ($scope.vars[0]).split(" - ");
           var varsV = $scope.varsV;
 
+          var link = 'https://apptest.data.npolar.no:3000/' + $scope.schema2 + '/?q=&fields=' + vars2[1] + '&limit=5000';
 
-          var vars_res = Schema2DBSearch.get({schema2:$scope.schema2, vars2:vars2[1]}, function(){
+          SchemaDBSearch.getValues(link).then( function(results) {
               var prop = vars2[1];
               var data2 = [];
 
-              var res = vars_res.feed.entries;
+              var res = results.data.feed.entries;
+              console.log(res);
 
                //data2 holds the array with all values of the variable
               for (var i=0; i<res.length; i++) {

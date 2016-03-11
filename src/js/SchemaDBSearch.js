@@ -3,11 +3,23 @@
 
 // @ngInject
 
-var SchemaDBSearch = function($resource){
-	//return $resource( 'https://apptest.data.npolar.no/sighting/?:search&format=json&locales=utf-8' , { search:'@search'}, {
-	return $resource( 'https://raw.githubusercontent.com/npolar/api.npolar.no/master/schema/:schema2.json', { schema2:'@schema2'}, {
-    query: {method: 'GET'}
-    });
+var Schema1DBSearch = function($resource, $http){
+	// Get either http://apptest.data.npolar.no/service/_ids.json
+     // or  http://api.npolar.no/service/?q=&format=json&fields=path
+    // https://apptest.data.npolar.no:3000/service/_ids.json
+	//return $resource( 'https://apptest.data.npolar.no:3000/service/_ids.json', {}, {
+
+  var getValues = function(Inputlink) {
+    console.log('making http request');
+    console.log(Inputlink);
+    return $http.get(Inputlink);
+  };
+
+  return {
+    getValues: getValues
+  }
 };
 
-module.exports = SchemaDBSearch;
+
+module.exports = Schema1DBSearch;
+
